@@ -13,7 +13,7 @@ KIOSK_URL="$1"
 # Systeem updaten en vereiste pakketten installeren
 echo "Updating system and installing required packages..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium-browser unclutter python3-xdg
+sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium-browser unclutter python3-xdg cec-utils
 
 # Autostart-script voor X11 en Chromium maken
 echo "Creating X startup script..."
@@ -46,6 +46,25 @@ if [ -z "\$DISPLAY" ] && [ "\$(tty)" = "/dev/tty1" ]; then
 fi
 EOF
 fi
+
+# Create scripts to turn TV on and off
+echo "Creating HDMI CEC control scripts..."
+cat << EOF | sudo tee /usr/local/bin/tv_on.sh
+#!/bin/bash
+echo "on 0" | cec-client -s -d 1
+EOF
+
+cat << EOF | sudo tee /usr/local/bin/tv_off.sh
+#!/bin/bash
+echo "standby 0" | cec-client -s -d 1
+EOF
+
+sudo chmod +x /usr/local/bin/tv_on.sh /usr/local/bin/tv_off.sh
+
+# Schedule cron jobs to turn TV on at 8 AM and off at 6 PM
+echo "Scheduling cron jobs for TV control..."
+(crontab -l 2>/dev/null; echo "0 8 * * * /usr/local/bin/tv_on.sh") | crontab -
+(crontab -l 2>/dev/null; echo "0 18 * * * /usr/local/bin/tv_off.sh") | crontab -
 
 # Automatisch inloggen als gebruiker 'pi'
 echo "Setting up auto-login for user pi..."
