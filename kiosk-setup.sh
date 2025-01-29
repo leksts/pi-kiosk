@@ -13,7 +13,7 @@ KIOSK_URL="$1"
 # Systeem updaten en vereiste pakketten installeren
 echo "Updating system and installing required packages..."
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium-browser unclutter
+sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium-browser unclutter python3-xdg
 
 # Autostart-script voor X11 en Chromium maken
 echo "Creating X startup script..."
@@ -29,13 +29,23 @@ done
 EOF
 chmod +x ~/.xinitrc
 
-# Automatisch X en Chromium starten bij inloggen
+# Configure auto-start on login
 echo "Configuring auto-start on login..."
-cat << EOF >> ~/.bash_profile
-if [[ -z \$DISPLAY ]] && [[ \$(tty) == /dev/tty1 ]]; then
+if [ -f ~/.bash_profile ]; then
+  PROFILE_FILE=~/.bash_profile
+else
+  PROFILE_FILE=~/.profile
+fi
+
+if ! grep -q 'startx' "$PROFILE_FILE"; then
+  cat << EOF >> "$PROFILE_FILE"
+
+# Start X at login on tty1
+if [ -z "\$DISPLAY" ] && [ "\$(tty)" = "/dev/tty1" ]; then
   startx
 fi
 EOF
+fi
 
 # Automatisch inloggen als gebruiker 'pi'
 echo "Setting up auto-login for user pi..."
