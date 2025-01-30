@@ -23,7 +23,7 @@ xset -dpms
 xset s noblank
 unclutter -idle 0 &
 while true; do
-  chromium-browser --noerrdialogs --disable-infobars --kiosk $KIOSK_URL || echo "Chromium crashed, restarting..."
+  chromium-browser --window-size=1920,1080 --start-fullscreen --noerrdialogs --disable-infobars --kiosk $KIOSK_URL || echo "Chromium crashed, restarting..."
   sleep 5
 done
 EOF
