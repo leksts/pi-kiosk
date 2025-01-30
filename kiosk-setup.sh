@@ -61,10 +61,10 @@ EOF
 
 sudo chmod +x /usr/local/bin/tv_on.sh /usr/local/bin/tv_off.sh
 
-# Schedule cron jobs to turn TV on at 8 AM and off at 6 PM
+# Schedule cron jobs to turn TV on at 8:30 AM on weekdays and off at 5:30 PM every day
 echo "Scheduling cron jobs for TV control..."
-(crontab -l 2>/dev/null; echo "0 8 * * * /usr/local/bin/tv_on.sh") | crontab -
-(crontab -l 2>/dev/null; echo "0 18 * * * /usr/local/bin/tv_off.sh") | crontab -
+(crontab -l 2>/dev/null; echo "30 8 * * 1-5 /usr/local/bin/tv_on.sh") | crontab -
+(crontab -l 2>/dev/null; echo "30 17 * * * /usr/local/bin/tv_off.sh") | crontab -
 
 # Automatisch inloggen als gebruiker 'pi'
 echo "Setting up auto-login for user pi..."
