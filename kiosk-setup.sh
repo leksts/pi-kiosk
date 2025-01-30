@@ -1,21 +1,21 @@
 #!/bin/bash
 
-set -e  # Stop script bij fouten
+set -e  # Stop script on errors
 
-# Controleer of een URL is meegegeven
+# Check if a URL is provided
 if [ -z "$1" ]; then
-  echo "Gebruik: $0 <KIOSK_URL>"
+  echo "Usage: $0 <KIOSK_URL>"
   exit 1
 fi
 
 KIOSK_URL="$1"
 
-# Systeem updaten en vereiste pakketten installeren
+# Update system and install required packages
 echo "Updating system and installing required packages..."
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y xserver-xorg x11-xserver-utils xinit openbox chromium-browser unclutter python3-xdg cec-utils
 
-# Autostart-script voor X11 en Chromium maken
+# Create X startup script for X11 and Chromium
 echo "Creating X startup script..."
 cat << EOF > ~/.xinitrc
 xset s off
@@ -66,7 +66,7 @@ echo "Scheduling cron jobs for TV control..."
 (crontab -l 2>/dev/null; echo "30 8 * * 1-5 /usr/local/bin/tv_on.sh") | crontab -
 (crontab -l 2>/dev/null; echo "30 17 * * * /usr/local/bin/tv_off.sh") | crontab -
 
-# Automatisch inloggen als gebruiker 'pi'
+# Set up auto-login for user 'pi'
 echo "Setting up auto-login for user pi..."
 sudo mkdir -p /etc/systemd/system/getty@tty1.service.d
 cat << EOF | sudo tee /etc/systemd/system/getty@tty1.service.d/autologin.conf
@@ -75,7 +75,7 @@ ExecStart=
 ExecStart=-/sbin/agetty --autologin pi --noclear %I \$TERM
 EOF
 
-# Herstarten om wijzigingen toe te passen
+# Reboot to apply changes
 echo "Installation complete! Rebooting in 5 seconds..."
 sleep 5
 sudo reboot
